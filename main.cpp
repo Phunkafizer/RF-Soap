@@ -113,8 +113,16 @@ int main (void)
 				timer.SetTime(1000);
 				break;
 				
-			case BTN_CONFIG: //is fired when main button is still pushed long after power up. can be used e.g. for config mode
+			case BTN_LONG: //is fired when main button and both side buttons are still pushed long after power up. can be used e.g. for something like learn mode
 				//just to show some button isses
+				LEDPORT &= ~(1<<LED1 | 1<<LED2 | 1<<LED3);
+				LEDPORT |= 1<<LED2 | 1<<LED3;
+				timer.SetTime(2000);
+				break;
+				
+			case BTN_CONFIG: //is fired when main button and both side buttons are still pushed long after power up. can be used e.g. for config mode
+				//just to show some button isses
+				LEDPORT &= ~(1<<LED1 | 1<<LED2 | 1<<LED3);
 				LEDPORT |= 1<<LED1 | 1<<LED2 | 1<<LED3;
 				timer.SetTime(2000);
 				break;

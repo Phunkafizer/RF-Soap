@@ -18,7 +18,8 @@ ISR (SIG_PIN_CHANGE2){}
 Button::Button(void)
 {
 	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-	
+
+	//pull ups for buttons
 	BUTTON_MAIN_PORT |= 1<<BUTTON_MAIN_PINX;
 	BUTTON_DOWN_PORT |= 1<<BUTTON_DOWN_PINX;
 	BUTTON_UP_PORT |= 1<<BUTTON_UP_PINX;
@@ -35,7 +36,7 @@ Button::Button(void)
 	}
 	
 	if ((d < (LONG_TIME / 100)) && d)
-		Shutdown(false); //button was released before device is switching on, 
+		Shutdown(false); //button was released before LONG_TIME, or button was not pushed at all, i.e. power via USB
 		
 	//check battery voltage 
 	rfm12.Trans(0x820C);

@@ -57,14 +57,17 @@ volatile uint8_t rxflag;
 
 Rfm12::Rfm12(void)
 {
+	//Initializing SPI port
 	SPCR = 1<<SPE | 1<<MSTR;
 	SPI_PORT |= 1<<NSEL;
 	SPI_DDR |= 1<<NSEL | 1<<MOSI | 1<<SCK;
 	PORTB |= 1<<PB1; //IRQ pullup
+	
 	//PORTC |= 1<<PC0; //FSK pullup, not neccessary for RFM12B
 	wakeupFlag = false;
 	rx2flag = false;
 	
+	//if internal clock is used, clock pin of RFM12 is disabled to save energy
 	#if USE_RFM_CLOCK == 1
 		pwr = 1<<ex | 1<<eb | 1<<ew | 0<<dc; //RFM12 power control (crystal and low bat detector)
 	#else
@@ -81,6 +84,7 @@ void Rfm12::Init(void)
 	l1_txbuf[PREAMBLE_LEN] = 0x2D; //sync pattern
 	l1_txbuf[PREAMBLE_LEN + 1] = 0xD4; //sync pattern
 	
+	//Initialize RFM12, refer to RFM12 datasheet for details
 	Trans(0x0000);
 	Trans(0x80D7); //Chap 1.: enable data register & fifo, 433 MHz band, 12 pF crystal load
 	Trans(0x8200 | pwr); //power control
@@ -105,7 +109,7 @@ bool Rfm12::Execute(void)
 {
 	bool result = false;
 	if (rxflag)
-	{
+	{//frame received
 		result = true;
 		rxflag = 0;
 		

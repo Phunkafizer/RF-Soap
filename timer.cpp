@@ -22,7 +22,7 @@ Timer::Timer(void)
 	if (timer_vector == 0)
 	{//this is the first timer object, init hardware timer
 	
-		//Init timer for timerobjects
+		//Init timer for timerobjects, timer IRQ has to be called once per ms
 		TCCR0A = 1<<WGM01; //CTC mode
 		#if (F_CPU / 256 > 1000)
 			#if (F_CPU / 256 / 8 > 1000)
