@@ -65,7 +65,7 @@ Rfm12::Rfm12(void)
 	wakeupFlag = false;
 	rx2flag = false;
 	
-	#ifdef USE_RFM_CLOCK
+	#if USE_RFM_CLOCK == 1
 		pwr = 1<<ex | 1<<eb | 1<<ew | 0<<dc; //RFM12 power control (crystal and low bat detector)
 	#else
 		pwr = 0<<ex | 1<<eb | 1<<ew | 1<<dc; //RFM12 power control (crystal and low bat detector)
@@ -89,14 +89,13 @@ void Rfm12::Init(void)
 	Trans(0x94A9); //Chap 5.: Receiver control, VDI output, VDI fast response, rx bandwidth 134 kHz, LNA gain -6 dB, RSSI thershold -97 dBm)
 	Trans(0xC2AB); //Chap 6.: Data filter. Auto lock, slow mode, digital filter, 
 	Trans(0xCA81); //Chap 7.: FIFO and reset mode. 8 bit fifo level, 
-	Trans(0xC4F7); //Chap 9.: AFC, auto keep, -10 kHz to 7.5 kHz range, 
-	Trans(0x9850); //chap 10.: TX config. +/- 90 kHz deviation, 0 dBm output power
+	Trans(0xC400 | 3 << 6 | 3 << 4 | 7); //Chap 9.: AFC, auto keep, -10 kHz to 7.5 kHz range, 
+	Trans(0x9800 | 0<<8 | 5 << 4 | 4); //chap 10.: mod polarity, TX deviation +/- 90 kHz deviation, output power
 	Trans(0xE000); //Chap 12.: disable wake up timer
 	Trans(0xC800); //Chap 13.: disable low duty cycle
 	Trans(0xC000 | RFMCLK<<5 | VBAT_MIN_VAL); //chap 14.: 2.5 MHz clock
 	
 	Trans(0x0000);
-	
 	
 	PCICR |= 1<<PCIE0; //Enable pin change interrupt 0
 	PCMSK0 |= 1<<PCINT1; //pin change mask, PCINT 1

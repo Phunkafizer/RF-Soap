@@ -53,13 +53,15 @@ MCU = atmega88
 #	Values wich the RFM12 offers
 #
 F_CPU =  1000000
-#         F_CPU =  1250000
-#         F_CPU =  2000000
-#         F_CPU =  2500000
-#         F_CPU =  3330000
+#F_CPU =  1250000
+#F_CPU =  2000000
+#F_CPU =  2500000
+#F_CPU =  3330000
 #F_CPU =  5000000
-#         F_CPU =  8000000
-#         F_CPU = 10000000
+#F_CPU =  8000000
+#F_CPU = 10000000
+#set 1 if external clock from RFM12 should be used
+USE_RFM_CLOCK = 0
 
 # Output format. (can be srec, ihex, binary)
 FORMAT = ihex
@@ -125,14 +127,11 @@ CSTANDARD = -std=gnu99
 # Place -D or -U options here for C sources
 CDEFS = -DF_CPU=$(F_CPU)UL
 
-
 # Place -D or -U options here for C++ sources
 CPPDEFS = -DF_CPU=$(F_CPU)UL
 #CPPDEFS += -D__STDC_LIMIT_MACROS
 #CPPDEFS += -D__STDC_CONSTANT_MACROS
-CPPDEFS += -DRECEIVER
-#CPPDEFS += -DTRANSMITTER
-
+CPPDEFS += -DUSE_RFM_CLOCK=$(USE_RFM_CLOCK)
 
 
 #---------------- Compiler Options C ----------------

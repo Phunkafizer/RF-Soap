@@ -34,7 +34,7 @@ Button::Button(void)
 		d--;
 	}
 	
-	if (d)
+	if ((d < (LONG_TIME / 100)) && d)
 		Shutdown(false); //button was released before device is switching on, 
 		
 	//check battery voltage 

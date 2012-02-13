@@ -17,8 +17,6 @@
 
 #define VBAT_MIN 3.2
 #define F0 434.750 //Centerfrequency / Mhz 
-//#define USE_RFM_CLOCK		//uncomment if AVR uses clock from RFM12
-
 
 #define VBAT_MIN_VAL (((uint8_t) ((VBAT_MIN - 2.2) * 10)) & 0x1F)
 

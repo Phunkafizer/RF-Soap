@@ -1,0 +1,22 @@
+Software framework for demonstrating RF SOAP modul
+
+Features
+--------
+- power handling (off, on, battery check)
+- button handling
+- rfm12 handling
+- power saving
+- UART (9600 baud, 8N1)
+
+Hints
+-----
+- Leave clock fuses in factory setting (1 MHz internal clock (8 MHz, clockdiv activated)
+
+Operation
+---------
+- Hold main button > 1 s (or connect USB to FT232, this will also power up the module)
+- if battery voltage is sufficient modul will start (middle led flashing)
+- with side buttons a value can be set between 1 and 3, indicated by the LEDs
+- with main button the value will be sent over radio
+- when value is received, the appropriate LED will flash and value is sent over serial interface
+- Hold mainbutton > 1 s to switch of

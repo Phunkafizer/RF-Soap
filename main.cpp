@@ -10,7 +10,6 @@
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
 #include "task.h"
-#include <util/delay.h>
 
 #include "rfm12.h"
 #include "timer.h"
@@ -18,7 +17,7 @@
 
 #define BAUD 9600L
 
-#define BAUDR (uint32_t) ((F_CPU / (8 * BAUD)) - .5)
+#define BAUDR (uint32_t) ((F_CPU / (8 * BAUD)) - 1)
 #define BAUDL BAUDR % 256
 #define BAUDH BAUDR / 256
 
@@ -28,11 +27,11 @@ int main (void)
 	LEDPORT |= 1<<LED2;
 	
 	//prepare UART
-	/*UCSR0A = 1<<U2X0;
+	UCSR0A = 1<<U2X0;
 	UCSR0B = 1<<TXEN0;
 	UCSR0C = 1<<UCSZ01 | 1<<UCSZ00;
 	UBRR0H = BAUDH;
-	UBRR0L = BAUDL;*/
+	UBRR0L = BAUDL;
 	
 	sei();
 	rfm12.Init();
@@ -60,7 +59,7 @@ int main (void)
 		if ((idle) && (timers_idle))
 		{
 			LEDPORT &= ~(1<<LED1 | 1<<LED2 | 1<<LED3);
-			rfm12.SetWakeupTimer(600); //rfm12 will wake up µC via IRQ pin after this time if no other event occurs (button, rfm data, rfm bat, ...)
+			rfm12.SetWakeupTimer(1000); //rfm12 will wake up µC via IRQ pin after this time if no other event occurs (button, rfm data, rfm bat, ...)
 			sleep_mode();
 		}
 		
@@ -68,26 +67,28 @@ int main (void)
 		uint8_t *rxdata;
 		rxdata = rfm12.GetRX(&rxlen);
 		if (rxdata)
-		{
+		{//rfm12 received a frame, we light a LED for 1 second if 0 < value < 2
 			if (rxdata[0] < 3)
+			{
 				LEDPORT |= 1<<(LED1 + rxdata[0]);
+				UDR0 = '1' + rxdata[0];
+			}
 			timer.SetTime(500);
 			rfm12.SetupRX();
 		}
-		
 		
 		uint8_t but = button.Check();
 		
 		switch (but)
 		{
-			case BTN_SHORT:
+			case BTN_SHORT: //main button pushed, we send a 1 Byte frame and flash a LED
 				rfm12.L1Send(&val, 1);
 				LEDPORT &= ~(1<<LED1 | 1<<LED2 | 1<<LED3);
 				LEDPORT |= 1<<(LED1 + val);
 				timer.SetTime(500);
 				break;
 				
-			case BTN_UP:
+			case BTN_UP://one of the side buttons was pushed, we increase 'val' and flash LED
 				if (val < 2)
 					val++;
 					
@@ -96,7 +97,7 @@ int main (void)
 				timer.SetTime(100);
 				break;
 				
-			case BTN_DOWN:
+			case BTN_DOWN://one of the side buttons was pushed, we decrease 'val' and flash LED
 				if (val > 0)
 					val--;
 					
@@ -106,14 +107,7 @@ int main (void)
 				break;
 				
 			case BTN_UPDOWN_LONG:
-				//just to show some button issues
-				LEDPORT &= ~(1<<LED1 | 1<<LED2 | 1<<LED3);
-				LEDPORT |= 1<<LED1 | 1<<LED3;
-				timer.SetTime(1000);
-				break;
-				
-			case BTN_LONG:
-				//just to show some button issues
+				//just to show some button issues, both side buttons were pushed long
 				LEDPORT &= ~(1<<LED1 | 1<<LED2 | 1<<LED3);
 				LEDPORT |= 1<<LED1 | 1<<LED3;
 				timer.SetTime(1000);
